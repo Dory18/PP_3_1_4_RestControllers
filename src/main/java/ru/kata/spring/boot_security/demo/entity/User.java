@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -27,43 +28,36 @@ public class User implements UserDetails {
     @Size(min = 2, max = 30, message = "Имя не может превышать 30 символов и быть меньше 2")
     @Column(name = "first_name")
     private String firstName;
-    @Size(min = 2, max = 40, message = "Отчество не может превышать 40 символов и быть меньше 2")
-    @Column(name = "middle_name")
-    private String middleName;
     @NotNull(message = "Укажите возраст")
     @Min(value = 14, message = "Пользователь должен быть старше 14 лет")
     @Column(name = "age")
     private int age;
-
-    @Size(min = 4, message = "Не меньше 4 знаков")
+    @NotEmpty(message = "Email должен быть заполнен")
+    @Email(message = "Введите корректный email")
     @Column(unique = true)
-    private String username;
-
-    @Size(min = 4, message = "Не меньше 4 знаков")
+    private String email;
+    @Column(name = "password")
     private String password;
 
-    @Transient
-    private String passwordConfirm;
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     private Set<Role> roles;
 
     public User() {
 
     }
 
-    public User(String lastName, String firstName, String middleName, int age, String username, String password) {
+    public User(String lastName, String firstName, String email, int age, String password) {
         this.lastName = lastName;
         this.firstName = firstName;
-        this.middleName = middleName;
         this.age = age;
-        this.username = username;
+        this.email = email;
         this.password = password;
     }
 
-    public User(String lastName, String firstName, String middleName, int age) {
+    public User(String lastName, String firstName, String email, int age) {
         this.lastName = lastName;
         this.firstName = firstName;
-        this.middleName = middleName;
+        this.email = email;
         this.age = age;
     }
 
@@ -73,9 +67,22 @@ public class User implements UserDetails {
                "id=" + id +
                ", lastName='" + lastName + '\'' +
                ", firstName='" + firstName + '\'' +
-               ", middleName='" + middleName + '\'' +
+               ", email='" + email + '\'' +
                ", age=" + age +
                '}';
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        User user = (User) object;
+        return age == user.age && Objects.equals(id, user.id) && Objects.equals(lastName, user.lastName) && Objects.equals(firstName, user.firstName) && Objects.equals(email, user.email) && Objects.equals(password, user.password) && Objects.equals(roles, user.roles);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, lastName, firstName, age, email, password, roles);
     }
 
     @Override
@@ -90,7 +97,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override

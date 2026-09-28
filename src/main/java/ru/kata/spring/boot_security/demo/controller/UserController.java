@@ -17,6 +17,6 @@ public class UserController {
     public String getUserById(@AuthenticationPrincipal User user, Model model) {
 
         model.addAttribute("user", user);
-        return "user_page/user";
+        return "private/user";
     }
 }

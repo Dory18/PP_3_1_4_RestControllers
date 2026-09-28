@@ -7,11 +7,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.kata.spring.boot_security.demo.entity.Role;
 import ru.kata.spring.boot_security.demo.entity.User;
 import ru.kata.spring.boot_security.demo.repository.UserRepository;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -32,8 +30,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User findByUserName(String userName) {
-        return userRepository.findByUsername(userName);
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override
@@ -44,21 +42,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Transactional
     @Override
     public void save(User user) {
-        userRepository.save(user);
-        if (user.getRoles() == null) {
-            user.setRoles(Collections.singleton(new Role(1L, "ROLE_USER")));
-        }
-        User existingUser = findById(user.getId());
-        if (existingUser != null) {
-            user.setPassword(existingUser.getPassword());
-        } else {
+        if (user.getId() == null) {
             user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+        } else {
+            User existingUser = findById(user.getId());
+            user.setPassword(existingUser.getPassword());
         }
+        userRepository.save(user);
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email);
     }
 
 }

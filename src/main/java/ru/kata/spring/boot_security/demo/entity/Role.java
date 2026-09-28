@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -16,7 +17,6 @@ public class Role implements GrantedAuthority {
     @Id
     private Long id;
     private String name;
-    private String label;
     @Transient
     @ManyToMany(mappedBy = "roles")
     private Set<User> users;
@@ -39,4 +39,16 @@ public class Role implements GrantedAuthority {
         return getName();
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Role role = (Role) object;
+        return Objects.equals(id, role.id) && Objects.equals(name, role.name) && Objects.equals(users, role.users);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, users);
+    }
 }

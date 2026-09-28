@@ -13,7 +13,7 @@ import ru.kata.spring.boot_security.demo.service.UserService;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/admin/users")
+@RequestMapping("/admin")
 @RequiredArgsConstructor
 public class AdminController {
 
@@ -21,60 +21,46 @@ public class AdminController {
     private final RoleService roleService;
 
     @GetMapping()
-    public String getAllUser(ModelMap model) {
+    public String adminPage(@ModelAttribute("user") User user,
+                            ModelMap model) {
+        model.addAttribute("allRoles", roleService.findAll());
         model.addAttribute("userList", userService.findAll());
-        return "user_page/users";
-    }
-
-    @GetMapping("/user")
-    public String getUserById(@RequestParam(value = "id") Long id,
-                              ModelMap model) {
-
-        model.addAttribute("user", userService.findById(id));
-        return "user_page/user";
+        return "private/admin";
     }
 
     @PostMapping("/delete")
     public String delete(@RequestParam(value = "id") Long id) {
         userService.deleteById(id);
-        return "redirect:/admin/users";
+        return "redirect:/admin";
     }
 
-    @GetMapping("/edit")
-    public String editUser(@RequestParam(value = "id") Long id,
-                           ModelMap model) {
-        model.addAttribute("user", userService.findById(id));
-        return "user_page/edit";
-    }
 
     @PostMapping("/edit")
-    public String update(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
+    public String update(@ModelAttribute("user") @Valid User user, Model model, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "user_page/edit";
+            model.addAttribute("allRoles", roleService.findAll());
+            model.addAttribute("userList", userService.findAll());
+            return "private/admin";
         }
         userService.save(user);
-        return "redirect:/admin/users";
+        return "redirect:/admin";
     }
 
-    @GetMapping("/new")
-    public String createUser(@ModelAttribute("user") User user,
-                             Model model) {
-        model.addAttribute("allRoles", roleService.findAll());
-        return "user_page/create";
-    }
 
     @PostMapping()
     public String create(@ModelAttribute("user") @Valid User user,
                          BindingResult bindingResult, Model model) {
+        model.addAttribute("userList", userService.findAll());
         model.addAttribute("allRoles", roleService.findAll());
         if (bindingResult.hasErrors()) {
-            return "user_page/create";
+            model.addAttribute("tabError", true);
+            return "private/admin";
         }
-        if (userService.findByUserName(user.getUsername()) != null) {
-            model.addAttribute("usernameError", "Пользователь с таким именем уже существует");
-            return "public/registration";
+        if (userService.findByEmail(user.getEmail()) != null) {
+            model.addAttribute("emailError", "Пользователь с таким именем уже существует");
+            return "private/admin";
         }
         userService.save(user);
-        return "redirect:/admin/users";
+        return "redirect:/admin";
     }
 }
