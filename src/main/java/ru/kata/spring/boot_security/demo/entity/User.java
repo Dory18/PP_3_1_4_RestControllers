@@ -20,20 +20,12 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotEmpty(message = "Фамилия должна быть заполнена")
-    @Size(min = 2, max = 50, message = "Фамилия не может превышать 50 символов и быть меньше 2")
     @Column(name = "last_name")
     private String lastName;
-    @NotEmpty(message = "Имя должно быть заполнено")
-    @Size(min = 2, max = 30, message = "Имя не может превышать 30 символов и быть меньше 2")
     @Column(name = "first_name")
     private String firstName;
-    @NotNull(message = "Укажите возраст")
-    @Min(value = 14, message = "Пользователь должен быть старше 14 лет")
     @Column(name = "age")
     private int age;
-    @NotEmpty(message = "Email должен быть заполнен")
-    @Email(message = "Введите корректный email")
     @Column(unique = true)
     private String email;
     @Column(name = "password")
