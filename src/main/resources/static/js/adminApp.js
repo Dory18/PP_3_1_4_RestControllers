@@ -3,23 +3,19 @@ const ROLES_API_URL = '/api/admin/roles';
 
 window.cachedAllRoles = [];
 
-// Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', async () => {
-    await loadAllRoles();       // 1. Сначала загружаем список ролей с бэкенда
-    await renderUsersTable();   // 2. Затем рендерим таблицу пользователей
-    initFormListeners();        // 3. Подключаем отправку форм (Edit, Delete, Add)
+    await loadAllRoles();
+    await renderUsersTable();
+    initFormListeners();
 
-    // 4. Пробуем заполнить форму создания ролей, если она уже отрендерена
     fillCreateUserRolesSelect();
 });
 
-// Загрузка всех ролей из REST-контроллера
 async function loadAllRoles() {
     try {
         const response = await fetch(ROLES_API_URL);
         if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
 
-        // Защита: проверяем, что сервер вернул именно JSON, а не HTML-страницу логина
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("html")) {
             console.error("Сервер вернул HTML вместо JSON ролей. Возможно, истекла сессия авторизации.");
@@ -28,15 +24,14 @@ async function loadAllRoles() {
 
         window.cachedAllRoles = await response.json();
 
-        // Пинаем форму создания, если она уже была в DOM
         fillCreateUserRolesSelect();
     } catch (error) {
         console.error('Error fetching roles:', error);
     }
 }
 
-// 1. Отрисовка таблицы пользователей
-window.renderUsersTable = async function() {
+// таблица пользователей
+window.renderUsersTable = async function () {
     try {
         const response = await fetch(ADMIN_API_URL);
         if (!response.ok) throw new Error(`HTTP dynamic error: ${response.status}`);
@@ -75,7 +70,7 @@ window.renderUsersTable = async function() {
     }
 }
 
-// 2. ОТКРЫТИЕ И ПРЕДЗАПОЛНЕНИЕ МОДАЛКИ РЕДАКТИРОВАНИЯ
+// модальное окно редактирования
 async function showEditModal(id) {
     const user = await fetchUserById(id);
     if (!user) return;
@@ -92,7 +87,7 @@ async function showEditModal(id) {
     editModal.show();
 }
 
-// 3. ОТКРЫТИЕ И ПРЕДЗАПОЛНЕНИЕ МОДАЛКИ УДАЛЕНИЯ
+// модальное окно удаления
 async function showDeleteModal(id) {
     const user = await fetchUserById(id);
     if (!user) return;
@@ -106,7 +101,7 @@ async function showDeleteModal(id) {
     deleteModal.show();
 }
 
-// Хелпер: Получение юзера по ID с сервера
+// Получение юзера по ID с сервера
 async function fetchUserById(id) {
     try {
         const response = await fetch(`${ADMIN_API_URL}/${id}`);
@@ -117,7 +112,7 @@ async function fetchUserById(id) {
     return null;
 }
 
-// Хелпер: заполнение списка <select> в модальных окнах
+// Заполнение списка ролей в модальных окнах
 function fillRolesSelect(selectId, userRoles) {
     const selectElem = document.getElementById(selectId);
     if (!selectElem) return;
@@ -138,8 +133,8 @@ function fillRolesSelect(selectId, userRoles) {
     });
 }
 
-// Функция-хелпер для формы создания пользователя
-window.fillCreateUserRolesSelect = function() {
+// создание пользователя
+window.fillCreateUserRolesSelect = function () {
     const selectElem = document.getElementById('role');
     if (!selectElem) return;
 
@@ -158,15 +153,15 @@ window.fillCreateUserRolesSelect = function() {
     });
 }
 
-// 4. НАВЕШИВАНИЕ ОБРАБОТЧИКОВ НА ОТПРАВКУ ФОРМ
+// отправка форм
 function initFormListeners() {
-    // --- Форма редактирования (PUT) ---
+    //редактирования
     const editForm = document.getElementById('edit-user-form');
     if (editForm) {
         editForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const selectedRoles = Array.from(document.getElementById('edit-roles').selectedOptions)
-                .map(opt => ({ id: parseInt(opt.value), name: opt.textContent }));
+                .map(opt => ({id: parseInt(opt.value), name: opt.textContent}));
             const updatedUser = {
                 id: parseInt(document.getElementById('edit-id').value),
                 firstName: document.getElementById('edit-firstName').value,
@@ -178,8 +173,8 @@ function initFormListeners() {
             const password = document.getElementById('edit-password').value;
             if (password) updatedUser.password = password;
             const response = await fetch(`${ADMIN_API_URL}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(updatedUser)
             });
             if (response.ok) {
@@ -191,13 +186,13 @@ function initFormListeners() {
         });
     }
 
-    // --- Форма удаления (DELETE) ---
+    // удаления
     const deleteForm = document.getElementById('delete-user-form');
     if (deleteForm) {
         deleteForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('delete-id').value;
-            const response = await fetch(`${ADMIN_API_URL}/${id}`, { method: 'DELETE' });
+            const response = await fetch(`${ADMIN_API_URL}/${id}`, {method: 'DELETE'});
             if (response.ok) {
                 bootstrap.Modal.getInstance(document.getElementById('deleteUserModal')).hide();
                 window.renderUsersTable();
@@ -207,7 +202,7 @@ function initFormListeners() {
         });
     }
 
-    // --- Форма создания (POST) ---
+    // создания
     const addForm = document.getElementById('add-user-form');
     if (addForm) {
         addForm.addEventListener('submit', async (e) => {
@@ -220,7 +215,7 @@ function initFormListeners() {
             const selectedRoles = Array.from(selectElem.selectedOptions).map(opt => {
                 const roleId = parseInt(opt.value);
                 const originalRole = window.cachedAllRoles.find(r => r.id === roleId);
-                return originalRole ? originalRole : { id: roleId, name: 'ROLE_' + opt.textContent };
+                return originalRole ? originalRole : {id: roleId, name: 'ROLE_' + opt.textContent};
             });
 
             const newUserPayload = {
@@ -235,7 +230,7 @@ function initFormListeners() {
             try {
                 const response = await fetch(ADMIN_API_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(newUserPayload)
                 });
 
@@ -262,13 +257,14 @@ function initFormListeners() {
             }
         });
     }
-// ИСПРАВЛЕНО: Правильная обработка переключения вкладок Bootstrap Tabs
+// переключение вкладок
     document.querySelectorAll('[data-bs-toggle="tab"], [data-bs-toggle="pill"]').forEach(tabEl => {
         tabEl.addEventListener('shown.bs.tab', () => {
             window.fillCreateUserRolesSelect();
         });
     });
 }
+
 function displayFormErrors(errors) {
     for (const [fieldName, message] of Object.entries(errors)) {
         const inputElem = document.getElementById(fieldName);
@@ -279,6 +275,7 @@ function displayFormErrors(errors) {
         }
     }
 }
+
 function clearFormErrors() {
     const inputs = document.querySelectorAll('#add-user-form .form-control, #add-user-form .form-select');
     inputs.forEach(input => input.classList.remove('is-invalid'));
@@ -286,4 +283,5 @@ function clearFormErrors() {
     feedbacks.forEach(fb => fb.textContent = '');
 }
 
-document.addEventListener('DOMContentLoaded', fetchAndRenderUser);users
+document.addEventListener('DOMContentLoaded', fetchAndRenderUser);
+users

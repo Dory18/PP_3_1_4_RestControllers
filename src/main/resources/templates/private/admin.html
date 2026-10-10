@@ -18,7 +18,6 @@
             <div class="bg-transparent ms-3">
                 <ul class="nav nav-tabs border-bottom-0 mb-0 pb-0" role="tablist" id="adminTabs">
                     <li>
-                        <!-- ИСПРАВЛЕНО: id и data-bs-target под стандарты JS -->
                         <button class="nav-link active"
                                 id="nav-users-tab"
                                 data-bs-toggle="tab"
@@ -30,7 +29,6 @@
                         </button>
                     </li>
                     <li>
-                        <!-- ИСПРАВЛЕНО: id и data-bs-target под стандарты JS -->
                         <button class="nav-link"
                                 id="nav-new-user-tab"
                                 data-bs-toggle="tab"
@@ -45,12 +43,9 @@
             </div>
 
             <div class="tab-content ms-3 bg-light">
-                <!-- ИСПРАВЛЕНО: id соответствует первой вкладке -->
                 <div id="nav-users" class="tab-pane fade show active" role="tabpanel" aria-labelledby="nav-users-tab">
                     <div th:replace="~{private/users_table :: users_table}"></div>
                 </div>
-
-                <!-- ИСПРАВЛЕНО: id соответствует второй вкладке -->
                 <div id="nav-new-user" class="tab-pane fade" role="tabpanel" aria-labelledby="nav-new-user-tab">
                     <div th:replace="~{private/create :: create}"></div>
                 </div>

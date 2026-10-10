@@ -35,12 +35,13 @@ public class AdminRestController {
         userService.deleteById(id);
         return ResponseEntity.ok().body(Map.of("message", "Пользователь успешно удален"));
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));
     }
 
-    @PutMapping()
+    @PatchMapping()
     public ResponseEntity<?> update(@RequestBody User user) {
         userService.save(user);
         return ResponseEntity.ok().body(Map.of("message", "Пользователь успешно обновлен"));

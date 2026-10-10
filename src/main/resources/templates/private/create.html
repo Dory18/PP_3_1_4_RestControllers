@@ -11,12 +11,10 @@
 <div th:fragment="create" class="border border-top-0">
     <p class="caption-top bg-light text-dark border fs-5 py-2 ps-3 pe-1 m-0 fw-medium">Add new user</p>
     <div class="container mt-5 content text-center">
-        <!-- Убрали th:action и th:object, добавили id="add-user-form" -->
         <form id="add-user-form" class="row g-3 align-items-center needs-validation" novalidate>
             <div class="col-sm-5 offset-sm-3">
                 <label for="firstName" class="fw-bold">First name</label>
                 <input type="text" id="firstName" placeholder="First name" class="form-control" required/>
-                <!-- Место для динамического вывода ошибок валидации -->
                 <div class="invalid-feedback" id="error-firstName"></div>
 
                 <label for="lastName" class="fw-bold mt-2">Last name</label>
