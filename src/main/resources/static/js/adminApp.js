@@ -235,7 +235,6 @@ function initFormListeners() {
                 });
 
                 if (response.ok) {
-                    alert('User created successfully!');
                     addForm.reset();
                     window.fillCreateUserRolesSelect();
                     window.renderUsersTable();
